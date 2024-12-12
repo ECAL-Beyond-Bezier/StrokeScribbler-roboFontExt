@@ -1,0 +1,13 @@
+name: StrokeScribbler
+developer: Connor Davenport
+developerURL: https://connordavenport.com
+launchAtStartUp: false
+version: '0.202b'
+addToMenu:
+- path: main.py
+  preferredName: StrokeScribbler
+  shortKey: ''
+  nestInSubmenus: False
+html: false
+requiresVersionMajor: '4'
+requiresVersionMinor: '4'
