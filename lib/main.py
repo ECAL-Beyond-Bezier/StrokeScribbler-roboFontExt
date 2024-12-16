@@ -714,7 +714,7 @@ class StrokeScribblerDrawingBot(Subscriber):
     def build(self):
 
         glyphEditor = self.getGlyphEditor()
-        self.container = glyphEditor.extensionContainer(CONTAINER_KEY, location="foreground")
+        self.container = glyphEditor.extensionContainer(CONTAINER_KEY, location="background")
 
         self.contoursLayer = self.container.appendPathSublayer(
             strokeColor=None,
