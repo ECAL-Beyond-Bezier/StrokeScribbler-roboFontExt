@@ -409,41 +409,26 @@ _thickness_symbol = ezui.makeImage(
             symbolName="pencil.tip",
             imagePath=os.path.join(resourcesPath, "pencil.tip.png"),
             template=True
-            # symbolConfiguration=dict(
-            #     colors=[colors.get("purple")]
-            # )
 )
 _density_symbol = ezui.makeImage(
             symbolName="circle.hexagonpath.fill",
             imagePath=os.path.join(resourcesPath, "circle.hexagonpath.fill.png"),
             template=True
-            # symbolConfiguration=dict(
-            #     colors=[colors.get("green")]
-            # )
 )
 _side_symbol = ezui.makeImage(
             symbolName="arrowshape.left.arrowshape.right.fill",
             imagePath=os.path.join(resourcesPath, "arrowshape.left.arrowshape.right.fill.png"),
             template=True
-            # symbolConfiguration=dict(
-            #     colors=[colors.get("blue")]
-            # )
 )
 _offset_symbol = ezui.makeImage(
             symbolName="arrow.down.left.and.arrow.up.right",
             imagePath=os.path.join(resourcesPath, "arrow.down.left.and.arrow.up.right.png"),
             template=True
-            # symbolConfiguration=dict(
-            #     colors=[colors.get("brown")]
-            # )
 )
 _random_symbol = ezui.makeImage(
             symbolName="pencil.and.scribble",
             imagePath=os.path.join(resourcesPath, "pencil.and.scribble.png"),
             template=True
-            # symbolConfiguration=dict(
-            #     colors=[colors.get("orange")]
-            # )
 )
 
 class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
@@ -551,35 +536,30 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
                     ),
                     dict(
                         identifier="thickness_settings",
-                        # title=_thickness_symbol,
                         title="Thi",
                         width=mini_col,
                         editable=False,
                         ),
                     dict(
                         identifier="flatten_settings",
-                        # title=_density_symbol,
                         title="Den",
                         width=mini_col,
                         editable=False,
                         ),
                     dict(
                         identifier="side_settings",
-                        # title=_side_symbol,
                         title="Side",
                         width=mini_col,
                         editable=False,
                         ),
                     dict(
                         identifier="offset_settings",
-                        # title=_offset_symbol,
                         title="Off",
                         width=mini_col,
                         editable=False,
                         ),
                     dict(
                         identifier="random_settings",
-                        # title=_random_symbol,
                         title="Rnd",
                         width=mini_col,
                         editable=False,
@@ -617,6 +597,21 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
 
         self.w.getItem("preview").setToolTip("Will draw stroke")
         self.w.getItem("side").setToolTip("The side of the contour that the drawing starts on")
+
+        symbols = [
+            _thickness_symbol,
+            _density_symbol,
+            _side_symbol,
+            _offset_symbol,
+            _random_symbol,
+        ]
+
+        nsTableView = self.w.getItem("groupTable")._table.getNSTableView()
+
+        for columnID, nsTableColumn in enumerate(nsTableView.tableColumns()):
+            if columnID != 0:
+                nsTableHeaderCell = nsTableColumn.headerCell()
+                nsTableHeaderCell.setImage_(symbols[columnID-1])
 
         self.contours = []
 
