@@ -1,28 +1,40 @@
 # coding: utf-8
 import vanilla
-from mojo.UI import getGlyphViewDisplaySettings, setGlyphViewDisplaySettings
-from fontTools.pens.basePen import BasePen
-from fontTools.pens.recordingPen import RecordingPen
-from fontPens.flattenPen import SamplingPen, FlattenPen
-from fontPens.penTools import estimateCubicCurveLength, distance, interpolatePoint, getCubicPoint, getQuadraticPoint
-
-
-import ezui
-import math
-from itertools import product
-import random
-from fontTools.misc.bezierTools import calcCubicArcLength
-from pprint import pprint
-
+from mojo.extensions import (
+    getExtensionDefault,
+    setExtensionDefault
+)
 from mojo.events import postEvent
-
 from mojo.subscriber import (
     Subscriber,
     registerGlyphEditorSubscriber,
     unregisterGlyphEditorSubscriber,
     registerSubscriberEvent,
 )
-
+from mojo.UI import (
+    getGlyphViewDisplaySettings,
+    setGlyphViewDisplaySettings
+)
+from fontTools.pens.basePen import BasePen
+from fontTools.pens.recordingPen import RecordingPen
+from fontPens.flattenPen import (
+    SamplingPen,
+    FlattenPen
+)
+from fontPens.penTools import (
+    estimateCubicCurveLength,
+    distance,
+    interpolatePoint,
+    getCubicPoint,
+    getQuadraticPoint
+)
+import ezui
+import math
+from itertools import product
+import random
+from fontTools.misc.bezierTools import calcCubicArcLength
+from pprint import pprint
+import os
 
 '''
 CHANGE LOG:
@@ -55,7 +67,7 @@ _Generate Contours_ will generate a new background layer with an open contour gl
 
 
 Thickness:                                      Stroke diameter of preview in glyphView
-Amount:                                         Amount of segments that contours are divided into
+Density:                                        Amount of segments that contours are divided into
 Offset:                                         Starting point offset count (1 will offset the next point over and up + 1)
 Random:                                         Randomize a jittering effect to simulate a "pen"
 
@@ -68,6 +80,7 @@ Random:                                         Randomize a jittering effect to 
 '''
 
 KEY = "com.connordavenport.Stroke"
+SETTINGS_KEY = KEY + ".settings"
 UI_EVENT_KEY = KEY + ".eventChanged"
 DB_EVENT_KEY = KEY + ".drawEventChanged"
 LAYER = "Stroke.contourGeneration"
@@ -345,8 +358,13 @@ def getContourPairs(glyph):
                 if len(item) == 5:
                     mid,segment,side,offset,random = item
                     parsed[contourPair] = item
-                    contours.append((IDtoRContours(glyph,contourPair),(mid,segment,side,offset,random)))
-    # glyph.lib[KEY] = parsed
+                    conts = IDtoRContours(glyph,contourPair)
+                    # Currently we will just ignore any contour groups
+                    # that are don't have two contours
+                    # i.e if you delete one contour
+                    # should we also just delete that from the lib? Maybe...
+                    if len(conts) == 2:
+                        contours.append((conts,(mid,segment,side,offset,random)))
     return contours
 
 def getSelectedPair(glyph):
@@ -357,8 +375,70 @@ def getSelectedPair(glyph):
     return selIDs
     
 
+fallback_settings = {
+    'thicknessSlider' : 4,
+    'flattenSlider'   : 35.0,
+    'offsetSlider'    : 0.0,
+    'randomSlider'    : 0.0,
+    'side'            : 0,
+    'editGroups'      : None,
+    'groupTable'      : [],
+    'colorWell'       : (1.0, 1.0, 1.0, 1.0),
+    'preview'         : 1
+}
 
 
+colors = {
+
+    'purple' :  (0.5819, 0.2157, 1.0, 1.0),
+    'green' :  (0.04, 0.57, 0.04, 1.0),
+    'orange' :  (0.99, 0.62, 0.11, 1.0),
+    'brown' :  (0.4791, 0.2884, 0.0, 1.0),
+}
+
+basePath = os.path.dirname(__file__)
+resourcesPath = os.path.join(basePath, "resources")
+
+_thickness_symbol = ezui.makeImage(
+            symbolName="pencil.tip",
+            imagePath=os.path.join(resourcesPath, "pencil.tip.png"),
+            template=True
+            # symbolConfiguration=dict(
+            #     colors=[colors.get("purple")]
+            # )
+)
+_density_symbol = ezui.makeImage(
+            symbolName="circle.hexagonpath.fill",
+            imagePath=os.path.join(resourcesPath, "circle.hexagonpath.fill.png"),
+            template=True
+            # symbolConfiguration=dict(
+            #     colors=[colors.get("green")]
+            # )
+)
+_side_symbol = ezui.makeImage(
+            symbolName="arrowshape.left.arrowshape.right.fill",
+            imagePath=os.path.join(resourcesPath, "arrowshape.left.arrowshape.right.fill.png"),
+            template=True
+            # symbolConfiguration=dict(
+            #     colors=[colors.get("blue")]
+            # )
+)
+_offset_symbol = ezui.makeImage(
+            symbolName="arrow.down.left.and.arrow.up.right",
+            imagePath=os.path.join(resourcesPath, "arrow.down.left.and.arrow.up.right.png"),
+            template=True
+            # symbolConfiguration=dict(
+            #     colors=[colors.get("brown")]
+            # )
+)
+_random_symbol = ezui.makeImage(
+            symbolName="pencil.and.scribble",
+            imagePath=os.path.join(resourcesPath, "pencil.and.scribble.png"),
+            template=True
+            # symbolConfiguration=dict(
+            #     colors=[colors.get("orange")]
+            # )
+)
 
 class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
 
@@ -375,7 +455,7 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
         > * VerticalStack 
         >> Thickness:                                             @thicknessText
         >> ---X--- [__](±)                                        @thicknessSlider
-        >> Amount:                                                @flattenText
+        >> Density:                                               @flattenText
         >> ---X--- [__](±)                                        @flattenSlider         
         >> Offset:                                                @offsetText
         >> ---X--- [__](±)                                        @offsetSlider
@@ -460,37 +540,42 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
                 items=self.settings,
                 columnDescriptions=[
                     dict(
-                        identifier="groupIndex",
+                        identifier="group_index",
                         title="Group Index",
-                        editable=False
+                        editable=False,
                     ),
                     dict(
                         identifier="thickness_settings",
-                        title="􁤓",
+                        # title=_thickness_symbol,
+                        title="Thi",
                         width=mini_col,
-                        editable=False
+                        editable=False,
                         ),
                     dict(
                         identifier="flatten_settings",
-                        title="􁅥",
+                        # title=_density_symbol,
+                        title="Den",
                         width=mini_col,
-                        editable=False
+                        editable=False,
                         ),
                     dict(
                         identifier="side_settings",
-                        title="􁉿",
+                        # title=_side_symbol,
+                        title="Side",
                         width=mini_col,
-                        editable=False
+                        editable=False,
                         ),
                     dict(
                         identifier="offset_settings",
-                        title="􀬑",
+                        # title=_offset_symbol,
+                        title="Off",
                         width=mini_col,
-                        editable=False
+                        editable=False,
                         ),
                     dict(
                         identifier="random_settings",
-                        title="􀤒",
+                        # title=_random_symbol,
+                        title="Rnd",
                         width=mini_col,
                         editable=False,
                         )
@@ -505,6 +590,28 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
             controller=self
         )
 
+        data = getExtensionDefault(SETTINGS_KEY, fallback_settings)
+        self.w.setItemValues(data)
+
+        tooltip_dict = {
+            "thickness" : "Thickness of each stroke",
+            "flatten"   : "Density of flatted contour",
+            "offset"    : "Amount of steps are skipped on the opposite side",
+            "random"    : "Randomness of to the stroke",
+        }
+
+        for title, description in tooltip_dict.items():
+            for sub in ["Text", "Slider"]:
+                _id = f"{title}{sub}"
+                self.w.getItem(_id).setToolTip(description),
+                # TIL that autoRepeat does not fix wrapping issue, we need
+                # to use setValueWraps_ on the nsObject instead 
+                if sub == "Slider":
+                    stepper = self.w.getItem(_id)._get_stepper()
+                    stepper._nsObject.setValueWraps_(False)
+
+        self.w.getItem("preview").setToolTip("Will draw stroke")
+        self.w.getItem("side").setToolTip("The side of the contour that the drawing starts on")
 
         self.contours = []
 
@@ -526,14 +633,15 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
 
     def started(self):
         self.fill = getGlyphViewDisplaySettings()['Fill']
-        setGlyphViewDisplaySettings({'Fill': not self.fill})
+        setGlyphViewDisplaySettings({'Fill': False})
         self.w.open()
         registerGlyphEditorSubscriber(StrokeScribblerDrawingBot)
 
 
     def destroy(self):
-        setGlyphViewDisplaySettings({'Fill': self.fill})
+        if self.fill: setGlyphViewDisplaySettings({'Fill': True})
         unregisterGlyphEditorSubscriber(StrokeScribblerDrawingBot)
+        setExtensionDefault(SETTINGS_KEY, self.w.getItemValues())
     
  
     def colorWellCallback(self,sender):
@@ -550,7 +658,7 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
             if self.selected:
                 for curSel in self.selected:
                     stp = getContourPairs(self.currentGlyph)
-                    si  = int(curSel["groupIndex"])
+                    si  = int(curSel["group_index"])
                     cps = stp[si][0]
                     for c in self.currentGlyph:
                         c.selected = False
@@ -609,7 +717,7 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
         if self.selected:
             for group in self.selected:
 
-                gg = conts[int(group["groupIndex"])]
+                gg = conts[int(group["group_index"])]
                 ci = " ".join(sorted([b.getIdentifier() for b in gg[0]]))
 
                 lib = self.currentGlyph.lib[KEY]
@@ -628,7 +736,7 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
             items = []
             for i,s in enumerate(getContourPairs(glyph)):
 
-                ir = dict(groupIndex         = str(i),
+                ir = dict(group_index         = str(i),
                           thickness_settings = s[1][0],
                           flatten_settings   = s[1][1],
                           side_settings      = s[1][2],
@@ -739,22 +847,18 @@ class StrokeScribblerDrawingBot(Subscriber):
         self.container.clearSublayers()
 
 
-    def drawContour(self, contour, color, strokeSize, segcount, random, amount=None, side="one"):
+    def drawContour(self, contour, color, stroke_size, seg_length, random, amount=None, side="one"):
         from defcon.objects.glyph import Glyph
 
         glyph = Glyph()
         outputPen = glyph.getPen()
-
-
-        flattenPen = StrokeFlattener(outputPen, approximateSegmentLength=segcount)
+        flattenPen = StrokeFlattener(outputPen, approximateSegmentLength=seg_length)
         contour.draw(flattenPen)
-
 
         pnf = PerlinNoiseFactory(2, octaves=4, tile=(1000/600, 1000/600))
         perlinGlyph(glyph, random * 10, pnf)
         flat = glyph[0] 
 
-        # flat = contour.getRepresentation("defcon.contour.flattened", approximateSegmentLength=40, segmentLines=True)
         layer = self.contoursLayer.appendPathSublayer(
             fillColor=None,
             strokeColor=None,
@@ -819,18 +923,34 @@ class StrokeScribblerDrawingBot(Subscriber):
                     side   = cinfo[2]
                     offset = cinfo[3]
                     random = cinfo[4]
-                    ps1,ref = self.drawContour(cont1,(1,0,0,1),3,segs,random,side="one")
-                    ps2,_ = self.drawContour(cont2,(0.0, 0.9811, 0.5737, 1.0),3,ref,random,side="two")
+                    ps1,ref = self.drawContour(
+                        contour     = cont1,
+                        color       = (1,0,0,1),
+                        stroke_size = 3,
+                        seg_length  = segs,
+                        random      = random,
+                        side        = "one"
+                    )
+
+                    ps2,_ = self.drawContour(
+                        contour     = cont2,
+                        color       = (0.0, 0.9811, 0.5737, 1.0),
+                        stroke_size = 3,
+                        seg_length  = ref,
+                        random      = random,
+                        side        = "two"
+                    )
+
 
                     if side:
                         ps1,ps2 = ps2,ps1
 
                     squiggle = self.contoursLayer.appendPathSublayer(
-                        strokeColor=fill,
-                        strokeWidth=mid,
-                        fillColor=None,
-                        strokeCap="round",
-                        strokeJoin="round",
+                        strokeColor = fill,
+                        strokeWidth = mid,
+                        fillColor   = None,
+                        strokeCap   = "round",
+                        strokeJoin  = "round",
                         )
                     pen = squiggle.getPen()
 
