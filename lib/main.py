@@ -28,13 +28,13 @@ from fontPens.penTools import (
     getCubicPoint,
     getQuadraticPoint
 )
+from defcon.objects.glyph import Glyph
 import ezui
-import math
-from itertools import product
-import random
 from fontTools.misc.bezierTools import calcCubicArcLength
-from pprint import pprint
+from itertools import product
 import os
+import math
+import random
 
 '''
 CHANGE LOG:
@@ -189,9 +189,11 @@ class StrokeFlattener(BasePen):
         self.otherPen.closePath()
         self.currentPt = None
 
+
     def _endPath(self):
         self.otherPen.endPath()
         self.currentPt = None
+
 
     def addComponent(self, glyphName, transformation):
         self.otherPen.addComponent(glyphName, transformation)
@@ -334,11 +336,14 @@ class PerlinNoiseFactory(object):
 def groupList(pairs):
     return [pairs[i * 2:(i + 1) * 2] for i in range((len(pairs) + 2 - 1) // 2 )]  
 
+
 def addPoints(pt0,pt1):
     return (pt0[0] + pt1[0], pt0[1] + pt1[1])
+
     
 def subtractPoints(pt0,pt1):
     return (pt0[0] - pt1[0], pt0[1] - pt1[1])
+
 
 def IDtoRContours(glyph,ID):
     allIDS = [(c,c.getIdentifier()) for c in glyph.contours]
@@ -348,6 +353,7 @@ def IDtoRContours(glyph,ID):
             if c.identifier == i:
                 rcs.append(c)
     return rcs
+
 
 def getContourPairs(glyph):
     contours = []
@@ -366,6 +372,7 @@ def getContourPairs(glyph):
                     if len(conts) == 2:
                         contours.append((conts,(mid,segment,side,offset,random)))
     return contours
+
 
 def getSelectedPair(glyph):
     selected = glyph.selectedContours
@@ -386,7 +393,6 @@ fallback_settings = {
     'colorWell'       : (1.0, 1.0, 1.0, 1.0),
     'preview'         : 1
 }
-
 
 colors = {
 
@@ -443,8 +449,6 @@ _random_symbol = ezui.makeImage(
 class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
 
     def build(self):
-
-
         self.settings  = []
         self.selected = None
 
@@ -490,6 +494,7 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
             side=dict(
                 width="fill",
             ),
+
             editGroups=dict(
                 width="fill",
             ),
@@ -654,11 +659,9 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
     def groupTableSelectionCallback(self,sender):
         self.selected = sender.getSelectedItems() if sender.getSelectedItems() else []
         self.selectionIndexes = sender.getSelectedIndexes() if sender.getSelectedIndexes() else []
-
-        for c in self.currentGlyph:
-            c.selected = False
-            
         if not self.fixing:
+            for c in self.currentGlyph:
+                c.selected = False
             if self.selected:
                 for curSel in self.selected:
                     stp = getContourPairs(self.currentGlyph)
@@ -755,7 +758,6 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
 
 
     def editGroupsCallback(self,sender):
-
         if sender.get() == 0:
             c = self.currentGlyph.selectedContours
 
@@ -779,13 +781,11 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
                         del tempDict[contourPair]
                 self.currentGlyph.lib[KEY] = tempDict
 
-
             self.selectionIndexes = []
 
         self.currentGlyph.lib.changed()
         self.rebuildTableItems(self.currentGlyph)
         postEvent(UI_EVENT_KEY, draw=True)
-        # self.draw()
 
 
     def generateCallback(self,sender):
@@ -809,20 +809,32 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
         postEvent(UI_EVENT_KEY, show_preview=sender.get())
 
 
+    def reselectTable(self):
+        self.fixing = True
+        stp = getContourPairs(self.currentGlyph)
+        sel = []
+        for io, cps in enumerate(stp):
+            (c1,c2),_ = cps
+            if c1.selected and c2.selected:
+                sel.append(io)
+        self.selectionIndexes = sel
+        self.fixing = False
+
+
     def drawSettingsChanged(self, info):
         if info["contours"] is not None:
-            self.contours = info["contours"]     
+            self.contours = info["contours"]  
+            self.reselectTable()
         if info["reset_glyph"] is not None:
             self.currentGlyph = info["reset_glyph"]
             self.selectionIndexes = []
-            self.rebuildTableItems(self.currentGlyph)
-        
-        
 
+        self.rebuildTableItems(self.currentGlyph)
+        
+        
 class StrokeScribblerDrawingBot(Subscriber):
 
     def build(self):
-
         glyphEditor = self.getGlyphEditor()
         self.container = glyphEditor.extensionContainer(CONTAINER_KEY, location="background")
 
@@ -839,9 +851,7 @@ class StrokeScribblerDrawingBot(Subscriber):
         self.random = 0
         self.preview = 1
         self.contours = []
-
         self.color = (1,1,1,1)
-
         self.currentGlyph = RGlyph(glyphEditor.getGlyph())
 
 
@@ -850,8 +860,6 @@ class StrokeScribblerDrawingBot(Subscriber):
 
 
     def drawContour(self, contour, color, stroke_size, seg_length, random, amount=None, side="one"):
-        from defcon.objects.glyph import Glyph
-
         glyph = Glyph()
         outputPen = glyph.getPen()
         flattenPen = StrokeFlattener(outputPen, approximateSegmentLength=seg_length)
@@ -884,12 +892,19 @@ class StrokeScribblerDrawingBot(Subscriber):
             self.draw()
 
 
+    def glyphEditorGlyphDidChangeSelection(self, info):
+        self.currentGlyph = info['glyph']
+        if self.currentGlyph is not None:
+            if self.currentGlyph.selectedContours:
+                postEvent(DB_EVENT_KEY, contours=self.currentGlyph)
+                # self.draw()
+
+
     def glyphEditorGlyphDidChange(self, info):
         self.currentGlyph = info['glyph']
         if self.currentGlyph is not None:
             postEvent(DB_EVENT_KEY, reset_glyph=self.currentGlyph)
             self.draw()
-
 
         
     def glyphEditorDidMouseDrag(self, info):
@@ -901,7 +916,6 @@ class StrokeScribblerDrawingBot(Subscriber):
 
     def draw(self, isSelected=False):
         # Draw the interpolated glyph outlines
-
         if self.preview:
             self.contours = []
             self.contoursLayer.clearSublayers()
@@ -933,7 +947,6 @@ class StrokeScribblerDrawingBot(Subscriber):
                         random      = random,
                         side        = "one"
                     )
-
                     ps2,_ = self.drawContour(
                         contour     = cont2,
                         color       = (0.0, 0.9811, 0.5737, 1.0),
@@ -942,8 +955,6 @@ class StrokeScribblerDrawingBot(Subscriber):
                         random      = random,
                         side        = "two"
                     )
-
-
                     if side:
                         ps1,ps2 = ps2,ps1
 
