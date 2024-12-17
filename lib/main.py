@@ -436,6 +436,11 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
     def build(self):
         self.settings  = []
         self.selected = None
+        self.selectionIndexes = []
+        self.fixing = False
+
+        self.currentGlyph = CurrentGlyph()
+
 
         content = """
         
@@ -475,7 +480,6 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
         mini_col = 40
 
         descriptionData = dict(
-
             side=dict(
                 width="fill",
             ),
@@ -576,7 +580,7 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
         )
 
         data = getExtensionDefault(SETTINGS_KEY, fallback_settings)
-        self.w.setItemValues(data)
+        if self.currentGlyph: self.w.setItemValues(data)
 
         tooltip_dict = {
             "thickness" : "Thickness of each stroke",
@@ -623,11 +627,6 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
         self.random    =   int(self.w.getItem("randomSlider").get())
 
         self.color     = tuple(self.w.getItem("colorWell").get())
-
-        self.selectionIndexes = []
-        self.fixing = False
-
-        self.currentGlyph = CurrentGlyph()
         self.rebuildTableItems(self.currentGlyph)
 
 
