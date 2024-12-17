@@ -459,7 +459,7 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
         > * VerticalStack 
         >> Thickness:                                             @thicknessText
         >> ---X--- [__](±)                                        @thicknessSlider
-        >> Density:                                               @flattenText
+        >> Distance:                                              @flattenText
         >> ---X--- [__](±)                                        @flattenSlider         
         >> Offset:                                                @offsetText
         >> ---X--- [__](±)                                        @offsetSlider
@@ -600,7 +600,7 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
 
         tooltip_dict = {
             "thickness" : "Thickness of each stroke",
-            "flatten"   : "Density of flatted contour",
+            "flatten"   : "Distance between hits on flatted contour",
             "offset"    : "Amount of steps are skipped on the opposite side",
             "random"    : "Randomness of to the stroke",
         }
