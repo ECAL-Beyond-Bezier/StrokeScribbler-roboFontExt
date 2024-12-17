@@ -654,14 +654,16 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
     def groupTableSelectionCallback(self,sender):
         self.selected = sender.getSelectedItems() if sender.getSelectedItems() else []
         self.selectionIndexes = sender.getSelectedIndexes() if sender.getSelectedIndexes() else []
+
+        for c in self.currentGlyph:
+            c.selected = False
+            
         if not self.fixing:
             if self.selected:
                 for curSel in self.selected:
                     stp = getContourPairs(self.currentGlyph)
                     si  = int(curSel["group_index"])
                     cps = stp[si][0]
-                    for c in self.currentGlyph:
-                        c.selected = False
 
                     for c in self.currentGlyph:
                         if c.getIdentifier() in [r.getIdentifier() for r in cps]:
