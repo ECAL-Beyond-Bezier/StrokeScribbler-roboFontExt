@@ -405,14 +405,6 @@ fallback_settings = {
     'preview'         : 1
 }
 
-colors = {
-
-    'purple' :  (0.5819, 0.2157, 1.0, 1.0),
-    'green' :  (0.04, 0.57, 0.04, 1.0),
-    'orange' :  (0.99, 0.62, 0.11, 1.0),
-    'brown' :  (0.4791, 0.2884, 0.0, 1.0),
-}
-
 basePath = os.path.dirname(__file__)
 resourcesPath = os.path.join(basePath, "resources")
 
@@ -551,13 +543,13 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
                     ),
                     dict(
                         identifier="thickness_settings",
-                        title="Thi",
+                        title="Thks",
                         width=mini_col,
                         editable=False,
                         ),
                     dict(
                         identifier="distance_settings",
-                        title="Den",
+                        title="Dist",
                         width=mini_col,
                         editable=False,
                         ),
@@ -575,7 +567,7 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
                         ),
                     dict(
                         identifier="random_settings",
-                        title="Rnd",
+                        title="Rand",
                         width=mini_col,
                         editable=False,
                         )
@@ -596,23 +588,25 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
 
         tooltip_dict = {
             "thickness" : "Thickness of each stroke",
-            "distance"   : "Distance between hits on flatted contour",
-            "offset"    : "Amount of steps are skipped on the opposite side",
-            "random"    : "Randomness of to the stroke",
+            "distance"  : "Distance between hits on flatted contour",
+            "side"      : "The side of the contour that the drawing starts on",
+            "offset"    : "Offset of hits that are skipped on the opposite side",
+            "random"    : "Randomness of the stroke",
         }
 
         for title, description in tooltip_dict.items():
-            for sub in ["Text", "Slider"]:
-                _id = f"{title}{sub}"
-                self.w.getItem(_id).setToolTip(description),
-                # TIL that autoRepeat does not fix wrapping issue, we need
-                # to use setValueWraps_ on the nsObject instead 
-                if sub == "Slider":
-                    stepper = self.w.getItem(_id)._get_stepper()
-                    stepper._nsObject.setValueWraps_(False)
+            if title != "side":
+                for sub in ["Text", "Slider"]:
+                    _id = f"{title}{sub}"
+                    self.w.getItem(_id).setToolTip(description),
+                    # TIL that autoRepeat does not fix wrapping issue, we need
+                    # to use setValueWraps_ on the nsObject instead 
+                    if sub == "Slider":
+                        stepper = self.w.getItem(_id)._get_stepper()
+                        stepper._nsObject.setValueWraps_(False)
 
         self.w.getItem("preview").setToolTip("Will draw stroke")
-        self.w.getItem("side").setToolTip("The side of the contour that the drawing starts on")
+        self.w.getItem("side").setToolTip(tooltip_dict["side"])
 
         symbols = [
             _thickness_symbol,
@@ -626,8 +620,18 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
 
         for columnID, nsTableColumn in enumerate(nsTableView.tableColumns()):
             if columnID != 0:
-                nsTableHeaderCell = nsTableColumn.headerCell()
-                nsTableHeaderCell.setImage_(symbols[columnID-1])
+                nsTableColumn.setHeaderToolTip_(
+                                                tooltip_dict[
+                                                            list(tooltip_dict.keys())[columnID-1]
+                                                            ]
+                                            )
+
+                # For now we are going to use abbreviations and tooltips 
+                # instead of the SF Symbols. Subject to change?
+                # nsTableHeaderCell = nsTableColumn.headerCell()
+                # nsTableHeaderCell.setImage_(symbols[columnID-1])
+
+
 
         self.contours  = []
         self.thickness = int(self.w.getItem("thicknessSlider").get())
