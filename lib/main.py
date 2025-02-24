@@ -70,7 +70,7 @@ KNOWN BUGS:
 DESCRIPTION:
 
 Stroke Scribbler
-Written by Connor Davenport for Kai Bernau
+Written by Connor Davenport for ECAL's MA Type Design "Beyond Bezier" research project.
 
 A tool for visualizing and adjusting how a glyph can be drawn using a Noordzijian drawing method.
 
@@ -97,6 +97,8 @@ Random:                                         Randomize a jittering effect to 
 
 
 ACKNOWLEDGMENTS / REFERENCES: 
+
+Financed by Kai Bernau
 
 Perlin Noise Python Implimentation:
     Mervyn Dow

@@ -2,7 +2,7 @@ name: StrokeScribbler
 developer: Connor Davenport
 developerURL: https://connordavenport.com
 launchAtStartUp: false
-version: '0.27b'
+version: '0.28b'
 addToMenu:
 - path: main.py
   preferredName: StrokeScribbler
