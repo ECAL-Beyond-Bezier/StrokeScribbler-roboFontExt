@@ -38,6 +38,10 @@ import random
 
 '''
 CHANGE LOG:
+    0.2.7
+        Renaming some variables
+        Fix white space inconsistencies 
+        Updating internal docs
     0.2.5
         Fix bug when deleting contour inside a group
         Fix table headers
@@ -56,17 +60,20 @@ CHANGE LOG:
         Color picker added
         Custom pen for Sampling AND Flattening
 
+
 KNOWN BUGS:
     02/11 - Cutting an object from a glyph breaks everything because points' identifier are lost
           - If `Distance` value is larger than one of segments and error is thrown:
                 • To get around this we need to just break that glyph into smaller groups
 
+
 DESCRIPTION:
 
-Stroke Scribbler™
+Stroke Scribbler
 Written by Connor Davenport for Kai Bernau
 
 A tool for visualizing and adjusting how a glyph can be drawn using a Noordzijian drawing method.
+
 
 DOCUMENTATION:
 
@@ -88,15 +95,48 @@ Random:                                         Randomize a jittering effect to 
 ( Generate Contours )                           Generate the preview "squiggle" to a background layer
 [X] Preview                                     Toggle visualization
 
+
+ACKNOWLEDGMENTS / REFERENCES: 
+
+Perlin Noise Python Implimentation:
+    Mervyn Dow
+    https://gist.github.com/eevee/26f547457522755cb1fb8739d0ea89a1
+Perlin Noise Pen Implimentation: 
+    Roberto Arista  
+    https://discord.com/channels/1052516637489766411/1205447799651434496/1205516038549016626
+Subscriber Event Extractor Code:
+    Erik van Blokland 
+    https://github.com/LettError/longboardRoboFontExtension/blob/b2435510549883573b0268eaff28adc5f3a979c5/source/lib/longboard.py#L1374C1-L1394C15
+
+
+LIBRARY COPYRIGHTS:
+    mojo
+        Copyright © 2025 TypeMyType
+    fontPens
+        Copyright © 2005-2017, The RoboFab Developers:
+            Erik van Blokland
+            Tal Leming
+            Just van Rossum
+    fontTools
+        Copyright © 2017 Just van Rossum
+    defcon
+        Copyright © 2005-2016 Type Supply LLC
+    vanilla
+        Copyright © 2005-2009 Tal Leming, Just van Rossum
+    ezui
+        Copyright © 2021, Tal Leming
+    Perlin noise implementation
+        Copyright © 2024 Mervyn Dow
 '''
 
-KEY = "com.connordavenport.Stroke"
-SETTINGS_KEY = KEY + ".settings"
-UI_EVENT_KEY = KEY + ".eventChanged"
-DB_EVENT_KEY = KEY + ".drawEventChanged"
-LAYER = "StrokeScribbler.drawing"
-CONTAINER_KEY = KEY + ".container"
-COLOR_KEY = KEY + ".color"
+
+KEY            = "com.connordavenport.Stroke"
+SETTINGS_KEY   = KEY + ".settings"
+UI_EVENT_KEY   = KEY + ".eventChanged"
+DRAW_EVENT_KEY = KEY + ".drawEventChanged"
+LAYER          = "StrokeScribbler.drawing"
+CONTAINER_KEY  = KEY + ".container"
+COLOR_KEY      = KEY + ".color"
 
 
 
@@ -486,16 +526,13 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
             side=dict(
                 width="fill",
             ),
-
             editGroups=dict(
                 width="fill",
             ),
-
             colorWell=dict(
                 colorWellStyle="minimal",
                 color=(1,1,1,1),
             ),
-
             thicknessSlider=dict(
                 valueType="integer",
                 minValue=1,
@@ -504,7 +541,6 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
                 tickMarks=21,
                 stopOnTickMarks=True,
             ),
-
             offsetSlider=dict(
                 valueType="integer",
                 minValue=0,
@@ -513,7 +549,6 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
                 tickMarks=5,
                 stopOnTickMarks=True,
             ),
-
             distanceSlider=dict(
                 valueType="integer",
                 minValue=10,
@@ -622,16 +657,13 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
             if columnID != 0:
                 nsTableColumn.setHeaderToolTip_(
                                                 tooltip_dict[
-                                                            list(tooltip_dict.keys())[columnID-1]
-                                                            ]
+                                                    list(tooltip_dict.keys())[columnID-1]
+                                                ]
                                             )
-
                 # For now we are going to use abbreviations and tooltips 
                 # instead of the SF Symbols. Subject to change?
                 # nsTableHeaderCell = nsTableColumn.headerCell()
                 # nsTableHeaderCell.setImage_(symbols[columnID-1])
-
-
 
         self.contours  = []
         self.thickness = int(self.w.getItem("thicknessSlider").get())
@@ -832,7 +864,7 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
         self.fixing = False
 
 
-    def drawSettingsChanged(self, info):
+    def drawingSettingsChanged(self, info):
         if info["contours"] is not None:
             self.contours = info["contours"]  
             self.reselectTable()
@@ -898,7 +930,7 @@ class StrokeScribblerDrawingBot(Subscriber):
                 parsed = {name:item for name,item in lib.items() if len(item) == 5}
                 # self.currentGlyph.lib[KEY] = parsed
             self.selectionIndexes = []
-            postEvent(DB_EVENT_KEY, reset_glyph=self.currentGlyph)
+            postEvent(DRAW_EVENT_KEY, reset_glyph=self.currentGlyph)
             self.draw()
 
 
@@ -906,21 +938,20 @@ class StrokeScribblerDrawingBot(Subscriber):
         self.currentGlyph = info['glyph']
         if self.currentGlyph is not None:
             if self.currentGlyph.selectedContours:
-                postEvent(DB_EVENT_KEY, contours=self.currentGlyph)
-                # self.draw()
+                postEvent(DRAW_EVENT_KEY, contours=self.currentGlyph)
 
 
     def glyphEditorGlyphDidChange(self, info):
         self.currentGlyph = info['glyph']
         if self.currentGlyph is not None:
-            postEvent(DB_EVENT_KEY, reset_glyph=self.currentGlyph)
+            postEvent(DRAW_EVENT_KEY, reset_glyph=self.currentGlyph)
             self.draw()
 
         
     def glyphEditorDidMouseDrag(self, info):
         self.currentGlyph = info['glyph']
         if self.currentGlyph is not None:
-            postEvent(DB_EVENT_KEY, reset_glyph=self.currentGlyph)
+            postEvent(DRAW_EVENT_KEY, reset_glyph=self.currentGlyph)
             self.draw()
 
 
@@ -931,7 +962,6 @@ class StrokeScribblerDrawingBot(Subscriber):
             self.contours = []
             if self.currentGlyph:
 
-                # if getContourPairs(self.currentGlyph) != [[],[]]:
                 selIDs = getSelectedPair(self.currentGlyph)
                 cps = getContourPairs(self.currentGlyph)
                 for c in cps:
@@ -994,7 +1024,7 @@ class StrokeScribblerDrawingBot(Subscriber):
                     pen.endPath()
                     self.contours.append(it)
 
-        postEvent(DB_EVENT_KEY, contours=self.contours)
+        postEvent(DRAW_EVENT_KEY, contours=self.contours)
 
 
     # Thanks to Erik van Blokland for the following 3 methods
@@ -1016,7 +1046,8 @@ class StrokeScribblerDrawingBot(Subscriber):
             self.color = info["color_value"]        
         self.draw()
 
-def previewSettingsExtractor(subscriber, info):
+
+def infoSettingsExtractor(subscriber, info):
     info["thickness_value"] = None
     info["distance_value"] = None
     info["side_value"] = None
@@ -1033,7 +1064,8 @@ def previewSettingsExtractor(subscriber, info):
         info["show_preview"] = lowLevelEvent.get("show_preview")
         info["color_value"] = lowLevelEvent.get("color_value")
 
-def drawingPreviewSettingsExtractor(subscriber, info):
+
+def drawingSettingsExtractor(subscriber, info):
     info["contours"] = None
     info["reset_glyph"] = None
     for lowLevelEvent in info["lowLevelEvents"]:
@@ -1045,17 +1077,18 @@ registerSubscriberEvent(
     subscriberEventName=UI_EVENT_KEY,
     methodName="settingsChanged",
     lowLevelEventNames=[UI_EVENT_KEY],
-    eventInfoExtractionFunction=previewSettingsExtractor,
+    eventInfoExtractionFunction=infoSettingsExtractor,
     dispatcher="roboFont",
     delay=0,
     debug=True
 )
 
+
 registerSubscriberEvent(
-    subscriberEventName=DB_EVENT_KEY,
-    methodName="drawSettingsChanged",
-    lowLevelEventNames=[DB_EVENT_KEY],
-    eventInfoExtractionFunction=drawingPreviewSettingsExtractor,
+    subscriberEventName=DRAW_EVENT_KEY,
+    methodName="drawingSettingsChanged",
+    lowLevelEventNames=[DRAW_EVENT_KEY],
+    eventInfoExtractionFunction=drawingSettingsExtractor,
     dispatcher="roboFont",
     delay=0,
     debug=True
