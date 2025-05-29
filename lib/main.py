@@ -443,7 +443,7 @@ fallback_settings = {
     'side'            : 0,
     'editGroups'      : None,
     'groupTable'      : [],
-    'colorWell'       : (1.0, 1.0, 1.0, 1.0),
+    'colorWell'       : (0.0, 0.0, 1.0, 1.0),
     'preview'         : 1
 }
 
@@ -492,6 +492,18 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
         * HorizontalStack
 
         > * VerticalStack 
+
+        >> * VerticalStack
+        >>> |------------------------|                            @groupTable
+        >>> | na | th | fl | si | of |   
+        >>> |----|----|----|----|----|
+        >>> |    |    |    |    |    |    
+        >>> |    |    |    |    |    |
+        >>> |------------------------|
+        >> ((( Add Contour Group | Delete Contour Group )))       @editGroups
+        
+        >> --------
+        
         >> Thickness:                                             @thicknessText
         >> ---X--- [__](±)                                        @thicknessSlider
         >> Distance:                                              @distanceText
@@ -500,26 +512,17 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
         >> ---X--- [__](±)                                        @offsetSlider
         >> Random:                                                @randomText
         >> ---X--- [__](±)                                        @randomSlider
-
+        >> * HorizontalStack
+        >>>  Begin scribble on: 
+        >>> ( Left | X Right X )                                   @side
+        
         >> --------
-                      
-        >> ( Left | X Right X )                                   @side
+        
+        >> * HorizontalStack 
+        >>> [X] Preview                                            @preview
+        >>> * ColorWell                                            @colorWell
+        >>> ( Generate Contours )                                  @generate
 
-        >> ((( Add Contour Group | Delete Contour Group )))       @editGroups
-
-        >> * VerticalStack
-
-        >>> |------------------------|                            @groupTable
-        >>> | na | th | fl | si | of |   
-        >>> |----|----|----|----|----|
-        >>> |    |    |    |    |    |    
-        >>> |    |    |    |    |    |
-        >>> |------------------------|
-
-        >> ( Generate Contours )                                  @generate
-
-        >> * ColorWell                                            @colorWell
-        >> [X] Preview                                            @preview
         """
 
         mini_col = 40
@@ -533,7 +536,7 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
             ),
             colorWell=dict(
                 colorWellStyle="minimal",
-                color=(1,1,1,1),
+                color=(0,0,1,1),
             ),
             thicknessSlider=dict(
                 valueType="integer",
@@ -547,16 +550,16 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
                 valueType="integer",
                 minValue=0,
                 maxValue=4,
-                value=1,
+                value=0,
                 tickMarks=5,
                 stopOnTickMarks=True,
             ),
             distanceSlider=dict(
                 valueType="integer",
-                minValue=10,
-                maxValue=100,
+                minValue=5,
+                maxValue=50,
                 value=20,
-                tickMarks=19,
+                tickMarks=10,
                 stopOnTickMarks=True,
             ),
             randomSlider=dict(
@@ -569,7 +572,6 @@ class StrokeScribblerWindowController(Subscriber, ezui.WindowController):
             ),
 
             groupTable=dict(
-                width=400,
                 height=400,
                 items=self.settings,
                 columnDescriptions=[
@@ -897,7 +899,7 @@ class StrokeScribblerDrawingBot(Subscriber):
         self.random = 0
         self.preview = 1
         self.contours = []
-        self.color = (1,1,1,1)
+        self.color = (0,0,1,1)
         self.currentGlyph = RGlyph(glyphEditor.getGlyph())
 
 
@@ -973,7 +975,7 @@ class StrokeScribblerDrawingBot(Subscriber):
                     cont1,cont2    = parsedContours
 
                     if isSelected:
-                        fill = (0,1,1,1)
+                        fill = (0,0,1,1)
 
                     fill   = self.color
                     mid    = cinfo[0]
@@ -983,7 +985,7 @@ class StrokeScribblerDrawingBot(Subscriber):
                     random = cinfo[4]
                     ps1,ref = self.drawContour(
                                             contour     = cont1,
-                                            color       = (1,0,0,1),
+                                            color       = (0,0,1,1),
                                             stroke_size = 3,
                                             seg_length  = segs,
                                             random      = random,
