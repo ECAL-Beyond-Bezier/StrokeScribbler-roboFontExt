@@ -86,6 +86,19 @@ Copyright © 2005-2009 Tal Leming, Just van Rossum
 Copyright © 2021, Tal Leming
 
 [Perlin Noise Generator](https://gist.github.com/eevee/26f547457522755cb1fb8739d0ea89a1)  
-Copyright © 2024 Mervyn Dow
+Copyright © 2024 Mervyn Dow  
+
+
+## Support
+
+Please [open an issue](https://github.com/ECAL-Beyond-Bezier/StrokeScribbler/issues/new) for support. We will do our best to make any bug fixes in a timely manner.
+
+## Contributing
+
+We can not promise that feature requests will be accepted but please, do feel free to make a PR or start a discussion!
+Please contribute using [Github Flow](https://guides.github.com/introduction/flow/). Create a branch, add commits, and [open a pull request](https://github.com/fraction/readme-boilerplate/compare/).
+
+
+
 
 
