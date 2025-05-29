@@ -17,7 +17,7 @@
 
 The extension is launched from RoboFont’s `Extensions` menu and will present this handsome window:
 
-![Behold the Stroke Scribbler palette](TKTKTK)
+![Behold the Stroke Scribbler palette](assets/images/palette.png)
 
 **Add Contour Group / Delete Contour Group**
 
@@ -96,7 +96,9 @@ Please [open an issue](https://github.com/ECAL-Beyond-Bezier/StrokeScribbler/iss
 ## Contributing
 
 We can not promise that feature requests will be accepted but please, do feel free to make a PR or start a discussion!
-Please contribute using [Github Flow](https://guides.github.com/introduction/flow/). Create a branch, add commits, and [open a pull request](https://github.com/fraction/readme-boilerplate/compare/).
+Please contribute using [Github Flow](https://guides.github.com/introduction/flow/). Create a branch, add commits, and [open a pull request](https://github.com/fraction/readme-boilerplate/compare/).  
+
+
 
 
 
