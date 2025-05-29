@@ -8,7 +8,7 @@
 
 **The visualisation can also be generated as a path, for example for use with [SingleLine otf-svgMaker](https://github.com/isdat-type/SingleLine_otf-svgMaker) by [Frederik Berlaen](https://github.com/typemytype) and [isdat-type](https://github.com/isdat-type).**
 
-**This plugin works with *RoboFont version 3 and above*.**
+**This plugin works with *RoboFont version 4.4 and above*.**
 
 
 
@@ -50,9 +50,9 @@ Stroke Scribbler is a result of the research project **[Beyond Bézier](https://
 
 Research for **Beyond Bézier** was carried out by by Matthieu Cortat-Roller, Alice Savoie, Kai Bernau, Radim Peško, Micha Wasem and Florence Yerly. The project started in September 2023 and was completed in May 2025. Raphaela Haefliger and Roland Früh were responsible for coordination and Nicolas Bernklau for design.
 
-The StrokeScribbler is a result of the project’s research axis *The Stroke* by [Kai Bernau](https://kaibernau.com). It was programmed and will be maintained by [Connor Davenport](https://github.com/connordavenport). 
+The StrokeScribbler is a result of the project’s research axis *The Stroke* by [Kai Bernau](https://kaibernau.com). It was programmed and will be maintained by [Connor Davenport](https://connordavenport.com). 
 
-Stroke Scribbler makes use of [Mervyn Dow](https://gist.github.com/eevee)’s [Perlin Noise Generator](https://gist.github.com/eevee/26f547457522755cb1fb8739d0ea89a1) and [Robertp Arista](https://gist.github.com/roberto-arista)’s [implementation](https://discord.com/channels/1052516637489766411/1205447799651434496/1205516038549016626) of that generator into a [fontTools](https://github.com/fonttools/fonttools) pen, as well as [Erik van Blokland]()’s [Subscriber Event extractor code](    https://github.com/LettError/longboardRoboFontExtension/blob/b2435510549883573b0268eaff28adc5f3a979c5/source/lib/longboard.py#L1374C1-L1394C15)
+Stroke Scribbler makes use of [Mervyn Dow](https://gist.github.com/eevee)’s [Perlin Noise Generator](https://gist.github.com/eevee/26f547457522755cb1fb8739d0ea89a1) and [Roberto Arista](https://gist.github.com/roberto-arista)’s [implementation](https://discord.com/channels/1052516637489766411/1205447799651434496/1205516038549016626) of that generator into a [fontTools](https://github.com/fonttools/fonttools) pen, as well as [Erik van Blokland]()’s [Subscriber Event extractor code](https://github.com/LettError/longboardRoboFontExtension/blob/b2435510549883573b0268eaff28adc5f3a979c5/source/lib/longboard.py#L1374C1-L1394C15)
 
 
 ## Copyright and License
@@ -85,6 +85,7 @@ Copyright © 2005-2009 Tal Leming, Just van Rossum
 [ezui](https://typesupply.github.io/ezui/)  
 Copyright © 2021, Tal Leming
 
-[Perlin Noise Generator](https://gist.github.com/eevee/26f547457522755cb1fb8739d0ea89a1)
+[Perlin Noise Generator](https://gist.github.com/eevee/26f547457522755cb1fb8739d0ea89a1)  
 Copyright © 2024 Mervyn Dow
+
 
