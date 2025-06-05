@@ -98,7 +98,10 @@ Random:                                         Randomize a jittering effect to 
 
 ACKNOWLEDGMENTS / REFERENCES: 
 
-Financed by Kai Bernau
+Stroke Scribbler is a result of the research project Beyond Bézier, 
+jointly organised and by ECAL (University of Art and Design Lausanne) 
+and HEIA-FR (Haute école d’ingénierie et d’architecture de Fribourg) 
+and has been supported by HES-SO, Réseau de Compétences Design et Arts Visuels.
 
 Perlin Noise Python Implimentation:
     Mervyn Dow
