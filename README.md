@@ -11,6 +11,11 @@
 **This plugin works with *RoboFont version 4.4 and above*.**
 
 
+## Downloading / Releases
+
+This extension is set for automated release handling with GitHub Action using the RoboFont-Extension-action.  
+You can download the latest release [here](https://github.com/ECAL-Beyond-Bezier/StrokeScribbler/releases/latest/download/StrokeScribbler.roboFontExt.zip)
+
 
 ## Interface and functionality
 
