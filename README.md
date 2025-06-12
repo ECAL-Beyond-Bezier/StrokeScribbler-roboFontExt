@@ -1,6 +1,6 @@
 # Stroke Scribbler
 
-![Behold the welcoming header image](TKTKTK)
+![Behold the welcoming header image](assets/images/header.png)
 
 **This is an extension for RoboFont, the font editor for adults. It creates a live, non-destructive visualisation of a zig-zag, scribble hatching movement in the glyph window to emphasise the *surface of the stroke* rather than its outlines.**
 
@@ -30,16 +30,22 @@ Changes to the scribble settings will update in real time, and modifications in 
 ### Settings
 
 - **Thickness** determines the thickness of the scribble line visualisation.
-- **Distance** of scribble lines. Lower Distance = more dense scribbles. (Nerds: distance is the segment length of a customised flattenPen)
-- **Offset** the first scribble line by skipping over a few corresponding points on the other contour. More Offset = more diagonal.
-- **Random** offsets of the scribbler points from the precisely calculated position to focus even more away from the exact outline.
-- Begin scribble on: 	**Left | Right** contour is the starting point of the scribble. That’s “right” or “left” in path direction.
+- **Distance** is the gappiness of the scribble lines. Lower Distance = more dense scribbles. (Nerds: distance is the segment length of a customised flattenPen)
+- **Offset** moves the angle of the first scribble line by skipping over a few corresponding points on the other contour. More Offset = more diagonal.
+- **Random** will offset the scribbler points from the precisely calculated position to focus even more away from the exact outline.
+- Begin scribble on: 	**Left | Right** determines which contour is the starting point of the scribble. That’s “right” or “left” in path direction.
 
 - ✅ **Preview** turn the visualizer off or on. You can change the color with the adjacent color well.
+
+![Behold the Preview](assets/images/preview.png)
 
 ### Generate Contours
 
 **Generate Contours** will generate an open contour with the heartline of all scribbles in the current glyph’s GroupTable in a layer named `StrokeScribbler.drawing`. If the layer does not exist, it will be provided for you. If the layer already exists and already has contours in it for the current glyph, it will be emptied of those prior contours free of charge.
+
+![Behold the Outline](assets/images/outline.png)
+
+
 
 Among other things, the open single line contours can be processed with the [Outliner](https://github.com/typemytype/outlinerRoboFontExtension) extension or the [SingleLine otf-svgMaker](https://github.com/isdat-type/SingleLine_otf-svgMaker) by [Frederik Berlaen](https://github.com/typemytype) and [isdat-type](https://github.com/isdat-type).
 
@@ -59,7 +65,7 @@ Stroke Scribbler makes use of [Mervyn Dow](https://gist.github.com/eevee)’s [P
 
 Stroke Scribbler Copyright © 2025 ECAL, Kai Bernau, Connor Davenport.
 
-Released under [TKTKTKTKTKTKTK](https://example.com) license.
+Released under MIT license.
 
 
 ### Libraries
