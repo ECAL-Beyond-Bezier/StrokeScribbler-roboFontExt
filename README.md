@@ -14,7 +14,7 @@
 ## Downloading / Releases
 
 This extension is set for automated release handling with GitHub Action using the RoboFont-Extension-action.  
-You can download the latest release [here](https://github.com/ECAL-Beyond-Bezier/StrokeScribbler/releases/latest/download/StrokeScribbler.roboFontExt.zip)
+You can download the latest release [here](https://github.com/ECAL-Beyond-Bezier/StrokeScribbler-roboFontExt/releases/latest/download/StrokeScribbler.roboFontExt.zip)
 
 
 ## Interface and functionality
@@ -102,7 +102,7 @@ Copyright © 2024 Mervyn Dow
 
 ## Support
 
-Please [open an issue](https://github.com/ECAL-Beyond-Bezier/StrokeScribbler/issues/new) for support. We will do our best to make any bug fixes in a timely manner.
+Please [open an issue](https://github.com/ECAL-Beyond-Bezier/StrokeScribbler-roboFontExt/issues/new) for support. We will do our best to make any bug fixes in a timely manner.
 
 ## Contributing
 
