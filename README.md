@@ -26,7 +26,7 @@ The extension is launched from RoboFont’s `Extensions` menu and will present t
 
 **Add Contour Group / Delete Contour Group**
 
-In an open Glyph Window, select **pairs** of **open**, **interpolateable** contours. Pressing `Add Contour Group` will add the contour pair to the Group Table where you can see its scribble settings. While selected in the Group Table, contour pairs can be edited with the settings below. 
+In an open Glyph Window, select **pairs** of **open**, **interpolateable** contours that constitute the left and right edges of a stroke. Pressing `Add Contour Group` will add the contour pair to the Group Table where you can see its scribble settings. While selected in the Group Table, contour pairs can be edited with the settings below. 
 
 Changes to the scribble settings will update in real time, and modifications in the Glyph Window of any contour from the Group Table will also update the visualisation in real time.
 
